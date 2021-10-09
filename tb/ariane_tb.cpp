@@ -238,6 +238,8 @@ done_processing:
     usage(argv[0]);
     return 1;
   }
+  printf("argc: %d\n", argc);
+  printf("optind: %d\n", optind);
   int htif_argc = 1 + argc - optind;
   htif_argv = (char **) malloc((htif_argc) * sizeof (char *));
   htif_argv[0] = argv[0];
@@ -248,6 +250,9 @@ done_processing:
 
   jtag = new remote_bitbang_t(rbb_port);
   dtm = new dtm_t(htif_argc, htif_argv);
+  printf("htif argc: %d\n", htif_argc);
+  for(int i=0; i<htif_argc; i++)
+    printf("htif agrv(%d): %s\n", i, htif_argv[i]);
   signal(SIGTERM, handle_sigterm);
 
   std::unique_ptr<Variane_testharness> top(new Variane_testharness);

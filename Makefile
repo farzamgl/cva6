@@ -2,6 +2,8 @@
 # Date: 03/19/2017
 # Description: Makefile for linting and testing Ariane.
 
+ver-opts       ?=
+
 # questa library
 library        ?= work
 # verilator lib
@@ -350,6 +352,8 @@ verilate_command := $(verilator)                                                
                     $(filter-out src/fpu_wrap.sv, $(filter-out %.vhd, $(src)))                                   \
                     +define+$(defines)                                                                           \
                     src/util/sram.sv                                                                             \
+                    tb/dram.sv                                                                                   \
+                    tb/host.sv                                                                                   \
                     +incdir+src/axi_node                                                                         \
                     $(if $(verilator_threads), --threads $(verilator_threads))                                   \
                     --unroll-count 256                                                                           \
@@ -378,7 +382,9 @@ verilate:
 	cd $(ver-library) && $(MAKE) -j${NUM_JOBS} -f Variane_testharness.mk
 
 sim-verilator: verilate
-	$(ver-library)/Variane_testharness $(elf-bin)
+	$(RISCV)/bin/riscv64-unknown-elf-objcopy -O verilog $(elf-bin) prog.mem
+	sed -i 's/@8/@0/g' prog.mem
+	$(ver-library)/Variane_testharness $(ver-opts) $(elf-bin)
 
 $(addsuffix -verilator,$(riscv-asm-tests)): verilate
 	$(ver-library)/Variane_testharness $(riscv-test-dir)/$(subst -verilator,,$@)

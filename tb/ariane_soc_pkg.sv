@@ -20,8 +20,8 @@ package ariane_soc;
   localparam NrSlaves = 2; // actually masters, but slaves on the crossbar
 
   // 4 is recommended by AXI standard, so lets stick to it, do not change
-  localparam IdWidth   = 4;
-  localparam IdWidthSlave = IdWidth + $clog2(NrSlaves);
+  localparam IdWidth   = 4 + $clog2(NrSlaves);
+  localparam IdWidthSlave = 4 + $clog2(NrSlaves);
 
   typedef enum int unsigned {
     DRAM     = 0,

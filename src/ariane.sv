@@ -783,6 +783,7 @@ module ariane #(
             end
           end
         end
+        $fflush(f);
       end
         cycles <= cycles + 1;
     end

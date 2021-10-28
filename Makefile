@@ -6,6 +6,7 @@
 library        ?= work
 # verilator lib
 ver-library    ?= work-ver
+ver-opts       ?=
 # library for DPI
 dpi-library    ?= work-dpi
 # Top level module to compile
@@ -560,6 +561,14 @@ xrun-check-benchmarks:
 
 xrun-ci: xrun-asm-tests xrun-amo-tests xrun-mul-tests xrun-fp-tests xrun-benchmarks
 
+print:
+	@for s in $(src); do \
+	echo $$s; \
+	done;
+	@for s in $(list_incdir); do \
+	echo $$s; \
+	done;
+
 # verilator-specific
 verilate_command := $(verilator)                                                                                 \
                     $(filter-out %.vhd, $(ariane_pkg))                                                           \
@@ -567,6 +576,8 @@ verilate_command := $(verilator)                                                
                     +define+$(defines) -DRVFI_TRACE=1                                                            \
                     common/local/util/sram.sv                                                                    \
                     corev_apu/tb/common/mock_uart.sv                                                             \
+                    corev_apu/tb/dram.sv                                                                         \
+                    corev_apu/tb/host.sv                                                                         \
                     +incdir+corev_apu/axi_node                                                                   \
                     $(if $(verilator_threads), --threads $(verilator_threads))                                   \
                     --unroll-count 256                                                                           \
@@ -660,7 +671,9 @@ verilate: $(if $(DROMAJO), dromajo,)
 	cd $(ver-library) && $(MAKE) -j${NUM_JOBS} -f Variane_testharness.mk
 
 sim-verilator: verilate
-	$(ver-library)/Variane_testharness $(elf-bin)
+	$(RISCV)/bin/riscv64-unknown-elf-objcopy -O verilog $(elf-bin) prog.mem
+	sed -i 's/@8/@0/g' prog.mem
+	$(ver-library)/Variane_testharness $(ver-opts) $(elf-bin)
 
 $(addsuffix -verilator,$(riscv-asm-tests)): verilate
 	$(ver-library)/Variane_testharness $(riscv-test-dir)/$(subst -verilator,,$@)

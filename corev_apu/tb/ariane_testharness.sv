@@ -20,7 +20,7 @@ module ariane_testharness #(
 `ifdef DROMAJO
   parameter bit          InclSimDTM        = 1'b0,
 `else
-  parameter bit          InclSimDTM        = 1'b1,
+  parameter bit          InclSimDTM        = 1'b0,
 `endif
   parameter int unsigned NUM_WORDS         = 2**25,         // memory size
   parameter bit          StallRandomOutput = 1'b0,
@@ -341,6 +341,46 @@ module ariane_testharness #(
     .rdata_o    ( rom_rdata )
   );
 `endif
+
+  // ---------------
+  // Nonsynth Host
+  // ---------------
+  logic host_req, host_we;
+  logic [AXI_ADDRESS_WIDTH-1:0] host_addr;
+  logic [AXI_DATA_WIDTH-1:0]    host_rdata, host_wdata;
+  logic [AXI_ADDRESS_WIDTH/8-1:0] host_be;
+
+  axi2mem #(
+    .AXI_ID_WIDTH   ( ariane_soc::IdWidthSlave ),
+    .AXI_ADDR_WIDTH ( AXI_ADDRESS_WIDTH        ),
+    .AXI_DATA_WIDTH ( AXI_DATA_WIDTH           ),
+    .AXI_USER_WIDTH ( AXI_USER_WIDTH           )
+  ) i_axi2host (
+    .clk_i  ( clk_i                   ),
+    .rst_ni ( ndmreset_n              ),
+    .slave  ( master[ariane_soc::GPIO]),
+    .req_o  ( host_req                ),
+    .we_o   ( host_we                 ),
+    .addr_o ( host_addr               ),
+    .be_o   ( host_be                 ),
+    .data_o ( host_wdata              ),
+    .data_i ( host_rdata              )
+  );
+
+  host #(
+    .addr_width_p (AXI_ADDRESS_WIDTH),
+    .data_width_p (AXI_DATA_WIDTH)
+  ) i_host (
+    .clk_i   (clk_i),
+    .reset_i ('0),
+    .req_i   (host_req),
+    .we_i    (host_we),
+    .addr_i  (host_addr),
+    .data_i  (host_wdata),
+    .be_i    (host_be),
+    .data_o  (host_rdata)
+  );
+
   // ------------------------------
   // Memory + Exclusive Access
   // ------------------------------
@@ -526,7 +566,7 @@ module ariane_testharness #(
     .data_o ( wdata        ),
     .data_i ( rdata        )
   );
-
+/*
   sram #(
     .DATA_WIDTH ( AXI_DATA_WIDTH ),
 `ifdef DROMAJO
@@ -542,6 +582,24 @@ module ariane_testharness #(
     .wdata_i    ( wdata                                                                       ),
     .be_i       ( be                                                                          ),
     .rdata_o    ( rdata                                                                       )
+  );
+*/
+
+  dram #(
+    .data_width_p(AXI_DATA_WIDTH),
+    .addr_width_p($clog2(NUM_WORDS)+$clog2(AXI_DATA_WIDTH/8)),
+    .mem_cap_in_bytes_p((NUM_WORDS * AXI_DATA_WIDTH)/8),
+    .mem_load_p(1),
+    .mem_file_p("prog.mem")
+  ) i_dram (
+    .clk_i        (clk_i),
+    .reset_i      ('0),
+    .v_i          (req),
+    .w_i          (we),
+    .addr_i       ({addr[$clog2(NUM_WORDS)+$clog2(AXI_DATA_WIDTH/8)-1:$clog2(AXI_DATA_WIDTH/8)], {$clog2(AXI_DATA_WIDTH/8){1'b0}}}),
+    .data_i       (wdata),
+    .write_mask_i (be),
+    .data_o       (rdata)
   );
 
   // ---------------
@@ -699,7 +757,7 @@ module ariane_testharness #(
 `ifdef SPIKE_TANDEM
     .debug_req_i          ( 1'b0                ),
 `else
-    .debug_req_i          ( debug_req_core      ),
+    .debug_req_i          ( 1'b0 /*debug_req_core*/      ),
 `endif
     .axi_req_o            ( axi_ariane_req      ),
     .axi_resp_i           ( axi_ariane_resp     )

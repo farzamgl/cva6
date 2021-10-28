@@ -888,6 +888,7 @@ module ariane import ariane_pkg::*; #(
             end
           end
         end
+        $fflush(f);
       end
         cycles <= cycles + 1;
     end

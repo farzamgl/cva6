@@ -20,7 +20,7 @@ package ariane_axi;
     // used in axi_adapter.sv
     typedef enum logic { SINGLE_REQ, CACHE_LINE_REQ } ad_req_t;
 
-    localparam IdWidth   = 4; // Recommended by AXI standard
+    localparam IdWidth   = 5; // Recommended by AXI standard
     localparam UserWidth = 1;
     localparam AddrWidth = 64;
     localparam DataWidth = 64;

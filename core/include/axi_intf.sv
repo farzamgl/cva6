@@ -237,7 +237,7 @@ interface AXI_LITE #(
     input ar_addr, ar_valid, output ar_ready,
     output r_data, r_resp, r_valid, input r_ready
   );
-
+/*
   /// The interface as an output (issuing requests, initiator, master).
   modport out (
     output aw_addr, aw_valid, input aw_ready,
@@ -255,10 +255,10 @@ interface AXI_LITE #(
     input ar_addr, ar_valid, output ar_ready,
     output r_data, r_resp, r_valid, input r_ready
   );
-
+*/
 endinterface
 
-
+/*
 /// An AXI routing table.
 ///
 /// For each slave, multiple rules can be defined. Each rule consists of an
@@ -307,3 +307,4 @@ interface AXI_ARBITRATION #(
   modport req(output in_req, out_ack, input  out_req, out_sel, in_ack);
 
 endinterface
+*/

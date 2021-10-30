@@ -12,7 +12,7 @@
 	url = https://github.com/pulp-platform/common_cells.git
 [submodule "corev_apu/axi"]
 	path = corev_apu/axi
-	url = https://github.com/pulp-platform/axi.git
+	url = https://github.com/farzamgl/axi.git
 [submodule "corev_apu/register_interface"]
 	path = corev_apu/register_interface
 	url = https://github.com/pulp-platform/register_interface.git
@@ -33,7 +33,7 @@
 	url = https://github.com/pulp-platform/tech_cells_generic.git
 [submodule "core/fpu"]
 	path = core/fpu
-	url = https://github.com/pulp-platform/fpnew.git
+	url = https://github.com/farzamgl/fpnew.git
 [submodule "corev_apu/fpga/src/ariane-ethernet"]
 	path = corev_apu/fpga/src/ariane-ethernet
 	url = https://github.com/lowRISC/ariane-ethernet.git

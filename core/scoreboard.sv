@@ -84,6 +84,9 @@ module scoreboard #(
 
   assign sb_full_o = issue_full;
 
+  sb_mem_t mem_q_commit;
+  assign mem_q_commit = mem_q[commit_pointer_q[0]];
+
   // output commit instruction directly
   always_comb begin : commit_ports
     for (int unsigned i = 0; i < NR_COMMIT_PORTS; i++) begin

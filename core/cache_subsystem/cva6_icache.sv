@@ -147,9 +147,11 @@ end else begin : gen_piton_offset
 ///////////////////////////////////////////////////////
 // main control logic
 ///////////////////////////////////////////////////////
+  logic hit;
   logic addr_ni;
   assign addr_ni = is_inside_nonidempotent_regions(ArianeCfg, areq_i.fetch_paddr);
   always_comb begin : p_fsm
+    hit          = 1'b0;
     // default assignment
     state_d      = state_q;
     cache_en_d   = cache_en_q & en_i;// disabling the cache is always possible, enable needs to go via flush
@@ -233,6 +235,7 @@ end else begin : gen_piton_offset
               state_d  = IDLE;
             // we have a hit or an exception output valid result
             end else if (((|cl_hit && cache_en_q) || areq_i.fetch_exception.valid) && !inv_q) begin
+              hit              = 1'b1;
               dreq_o.valid     = ~dreq_i.kill_s2;// just don't output in this case
               state_d          = IDLE;
 

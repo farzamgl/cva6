@@ -269,7 +269,7 @@ module scoreboard #(
   // Read Operands (a.k.a forwarding)
   // ----------------------------------
   // read operand interface: same logic as register file
-  logic [NR_ENTRIES+NR_WB_PORTS-1:0] rs1_fwd_req, rs2_fwd_req, rs3_fwd_req;
+  logic [NR_ENTRIES+NR_WB_PORTS-1:0] rs1_fwd_req, rs2_fwd_req, rs3_fwd_req, rd_fwd_req;
   logic [NR_ENTRIES+NR_WB_PORTS-1:0][riscv::XLEN-1:0] rs_data;
   logic rs1_valid, rs2_valid;
 
@@ -278,12 +278,14 @@ module scoreboard #(
     assign rs1_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs1_i) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rs1_fpr(issue_instr_o.op));
     assign rs2_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs2_i) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rs2_fpr(issue_instr_o.op));
     assign rs3_fwd_req[k] = (mem_q[trans_id_i[k]].sbe.rd == rs3_i) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_imm_fpr(issue_instr_o.op));
+    assign rd_fwd_req[k]  = (mem_q[trans_id_i[k]].sbe.rd == issue_instr_o.rd) & wt_valid_i[k] & (~ex_i[k].valid) & (mem_q[trans_id_i[k]].is_rd_fpr_flag == ariane_pkg::is_rd_fpr(issue_instr_o.op));
     assign rs_data[k]     = wbdata_i[k];
   end
   for (genvar k = 0; unsigned'(k) < NR_ENTRIES; k++) begin : gen_rs_entries
     assign rs1_fwd_req[k+NR_WB_PORTS] = (mem_q[k].sbe.rd == rs1_i) & mem_q[k].issued & mem_q[k].sbe.valid & (mem_q[k].is_rd_fpr_flag == ariane_pkg::is_rs1_fpr(issue_instr_o.op));
     assign rs2_fwd_req[k+NR_WB_PORTS] = (mem_q[k].sbe.rd == rs2_i) & mem_q[k].issued & mem_q[k].sbe.valid & (mem_q[k].is_rd_fpr_flag == ariane_pkg::is_rs2_fpr(issue_instr_o.op));
     assign rs3_fwd_req[k+NR_WB_PORTS] = (mem_q[k].sbe.rd == rs3_i) & mem_q[k].issued & mem_q[k].sbe.valid & (mem_q[k].is_rd_fpr_flag == ariane_pkg::is_imm_fpr(issue_instr_o.op));
+    assign rd_fwd_req[k+NR_WB_PORTS]  = (mem_q[k].sbe.rd == issue_instr_o.rd) & mem_q[k].issued & mem_q[k].sbe.valid & (mem_q[k].is_rd_fpr_flag == ariane_pkg::is_rd_fpr(issue_instr_o.op));
     assign rs_data[k+NR_WB_PORTS]     = mem_q[k].sbe.result;
   end
 

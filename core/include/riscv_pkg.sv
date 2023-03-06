@@ -368,6 +368,7 @@ package riscv;
         CSR_MIE            = 12'h304,
         CSR_MTVEC          = 12'h305,
         CSR_MCOUNTEREN     = 12'h306,
+        CSR_MUCOUNTEREN    = 12'h320,
         CSR_MSCRATCH       = 12'h340,
         CSR_MEPC           = 12'h341,
         CSR_MCAUSE         = 12'h342,

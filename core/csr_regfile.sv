@@ -120,6 +120,7 @@ module csr_regfile import ariane_pkg::*; #(
     riscv::xlen_t mip_q,       mip_d;
     riscv::xlen_t mie_q,       mie_d;
     riscv::xlen_t mcounteren_q,mcounteren_d;
+    riscv::xlen_t mucounteren_q,mucounteren_d;
     riscv::xlen_t mscratch_q,  mscratch_d;
     riscv::xlen_t mepc_q,      mepc_d;
     riscv::xlen_t mcause_q,    mcause_d;
@@ -233,6 +234,7 @@ module csr_regfile import ariane_pkg::*; #(
                 riscv::CSR_MIE:                csr_rdata = mie_q;
                 riscv::CSR_MTVEC:              csr_rdata = mtvec_q;
                 riscv::CSR_MCOUNTEREN:         csr_rdata = mcounteren_q;
+                riscv::CSR_MUCOUNTEREN:        csr_rdata = mucounteren_q;
                 riscv::CSR_MSCRATCH:           csr_rdata = mscratch_q;
                 riscv::CSR_MEPC:               csr_rdata = mepc_q;
                 riscv::CSR_MCAUSE:             csr_rdata = mcause_q;
@@ -373,6 +375,7 @@ module csr_regfile import ariane_pkg::*; #(
         mepc_d                  = mepc_q;
         mcause_d                = mcause_q;
         mcounteren_d            = mcounteren_q;
+        mucounteren_d           = mucounteren_q;
         mscratch_d              = mscratch_q;
         mtval_d                 = mtval_q;
         dcache_d                = dcache_q;
@@ -545,6 +548,7 @@ module csr_regfile import ariane_pkg::*; #(
                     if (csr_wdata[0]) mtvec_d = {csr_wdata[riscv::XLEN-1:8], 7'b0, csr_wdata[0]};
                 end
                 riscv::CSR_MCOUNTEREN:         mcounteren_d = {{riscv::XLEN-32{1'b0}}, csr_wdata[31:0]};
+                riscv::CSR_MUCOUNTEREN:        mucounteren_d = {{riscv::XLEN-32{1'b0}}, csr_wdata[31:0]};
 
                 riscv::CSR_MSCRATCH:           mscratch_d  = csr_wdata;
                 riscv::CSR_MEPC:               mepc_d      = {csr_wdata[riscv::XLEN-1:1], 1'b0};
@@ -1067,6 +1071,8 @@ module csr_regfile import ariane_pkg::*; #(
             // debug signals
 `ifdef DROMAJO
             debug_mode_q           <= 1'b1;
+`elsif DEBUG
+            debug_mode_q           <= 1'b1;
 `else
             debug_mode_q           <= 1'b0;
 `endif
@@ -1088,6 +1094,7 @@ module csr_regfile import ariane_pkg::*; #(
             mepc_q                 <= {riscv::XLEN{1'b0}};
             mcause_q               <= {riscv::XLEN{1'b0}};
             mcounteren_q           <= {riscv::XLEN{1'b0}};
+            mucounteren_q          <= {riscv::XLEN{1'b0}};
             mscratch_q             <= {riscv::XLEN{1'b0}};
             mtval_q                <= {riscv::XLEN{1'b0}};
             dcache_q               <= {{riscv::XLEN-1{1'b0}}, 1'b1};
@@ -1131,6 +1138,7 @@ module csr_regfile import ariane_pkg::*; #(
             mepc_q                 <= mepc_d;
             mcause_q               <= mcause_d;
             mcounteren_q           <= mcounteren_d;
+            mucounteren_q          <= mucounteren_d;
             mscratch_q             <= mscratch_d;
             mtval_q                <= mtval_d;
             dcache_q               <= dcache_d;
